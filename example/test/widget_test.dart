@@ -12,7 +12,7 @@ void main() {
             body: Column(
               children: [
                 Expanded(
-                  child: CarouselView(
+                  child: CarouselViewV2(
                     itemExtent: 200,
                     children: List.generate(
                       5,
@@ -29,7 +29,7 @@ void main() {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: CarouselIndicator(
-                    style: style,
+                    styleIndicator: style,
                     count: 5,
                     currentIndex: 2,
                     activeColor: Colors.blue,
@@ -53,11 +53,11 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: CarouselView(
+          body: CarouselViewV2(
             itemExtent: 200,
             scrollDirection: Axis.vertical,
             indicator: const CarouselIndicator(
-              style: StyleIndicator.dotIndicator,
+              styleIndicator: StyleIndicator.dotIndicator,
               count: 5,
               currentIndex: 0,
               activeColor: Colors.blue,
@@ -80,7 +80,7 @@ void main() {
     expect(find.text('Item 0'), findsOneWidget);
 
     // Simulate vertical scroll
-    await tester.drag(find.byType(CarouselView), const Offset(0, -300));
+    await tester.drag(find.byType(CarouselViewV2), const Offset(0, -300));
     await tester.pumpAndSettle();
 
     // Item 1 should be visible after scrolling
@@ -94,7 +94,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: CarouselView(
+          body: CarouselViewV2(
             itemExtent: 200,
             onTap: (index) {
               tappedIndex = index;

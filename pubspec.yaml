@@ -1,5 +1,5 @@
 name: flutter_custom_caraousel_v2
-description: "A new Flutter package project."
+description: "A customizable, feature-rich carousel implementation for Flutter that follows Material Design 3 principles. This package supports multiple carousel layouts, autoplay functionality, custom indicators, and full controller capabilities."
 version: 0.0.1
 homepage: https://github.com/adampermana/flutter_custom_caraousel_v2
 license: MIT

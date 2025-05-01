@@ -8,7 +8,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: CarouselView(
+            body: CarouselViewV2(
               itemExtent: 200,
               children: List.generate(
                 5,
@@ -74,10 +74,10 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: CarouselView(
+              body: CarouselViewV2(
                 itemExtent: 200,
                 indicator: const CarouselIndicator(
-                  style: StyleIndicator.dotIndicator,
+                  styleIndicator: StyleIndicator.dotIndicator,
                   count: 5,
                   currentIndex: 0,
                   activeColor: Colors.blue,
@@ -111,10 +111,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: CarouselView(
+            body: CarouselViewV2(
               itemExtent: 200,
               indicator: const CarouselIndicator(
-                style: StyleIndicator.expandingDotIndicator,
+                styleIndicator: StyleIndicator.expandingDotIndicator,
                 count: 3,
                 currentIndex: 1,
                 activeColor: Colors.blue,
@@ -140,10 +140,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: CarouselView(
+            body: CarouselViewV2(
               itemExtent: 200,
               indicator: const CarouselIndicator(
-                style: StyleIndicator.circularIndicator,
+                styleIndicator: StyleIndicator.circularIndicator,
                 count: 3,
                 currentIndex: 1,
                 activeColor: Colors.blue,

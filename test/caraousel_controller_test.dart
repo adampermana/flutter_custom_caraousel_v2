@@ -5,7 +5,7 @@ import 'package:flutter_custom_caraousel_v2/flutter_custom_caraousel_v2.dart';
 void main() {
   testWidgets('CarouselController currentItem returns null when no clients',
       (WidgetTester tester) async {
-    final controller = CarouselController();
+    final controller = CarouselControllerv2();
 
     // Controller without any attached carousel should return null for currentItem
     expect(controller.currentItem, isNull);
@@ -13,12 +13,12 @@ void main() {
 
   testWidgets('CarouselController works with weighted carousel',
       (WidgetTester tester) async {
-    final controller = CarouselController();
+    final controller = CarouselControllerv2();
 
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: CarouselView.weighted(
+          body: CarouselViewV2.weighted(
             flexWeights: const [1, 2, 1],
             controller: controller,
             children: List.generate(

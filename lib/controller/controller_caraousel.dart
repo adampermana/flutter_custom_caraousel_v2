@@ -1,26 +1,26 @@
 part of '../../flutter_custom_caraousel_v2.dart';
 
-/// A controller for [CarouselView].
+/// A controller for [CarouselViewV2].
 ///
 /// Using a carousel controller helps to show the first visible item on the
 /// carousel list.
-class CarouselController extends ScrollController {
+class CarouselControllerv2 extends ScrollController {
   /// Creates a carousel controller.
-  CarouselController({
+  CarouselControllerv2({
     this.initialItem = 0,
   });
 
-  /// The item that expands to the maximum size when first creating the [CarouselView].
+  /// The item that expands to the maximum size when first creating the [CarouselViewV2].
   final int initialItem;
 
-  CarouselViewState? _carouselState;
+  CarouselViewV2State? _carouselState;
 
   // ignore: use_setters_to_change_properties
-  void _attach(CarouselViewState anchor) {
+  void _attach(CarouselViewV2State anchor) {
     _carouselState = anchor;
   }
 
-  void _detach(CarouselViewState anchor) {
+  void _detach(CarouselViewV2State anchor) {
     if (_carouselState == anchor) {
       _carouselState = null;
     }
@@ -50,7 +50,7 @@ class CarouselController extends ScrollController {
     carouselPosition.consumeMaxWeight = _carouselState!._consumeMaxWeight;
   }
 
-  /// Animates the controlled [CarouselView] to the given item index.
+  /// Animates the controlled [CarouselViewV2] to the given item index.
   ///
   /// The animation lasts for the given duration and follows the given curve.
   /// The returned [Future] resolves when the animation completes.
@@ -76,7 +76,7 @@ class CarouselController extends ScrollController {
     );
   }
 
-  /// Jumps the controlled [CarouselView] to the given item index.
+  /// Jumps the controlled [CarouselViewV2] to the given item index.
   ///
   /// This is an instantaneous movement to the given item.
   void jumpToItem(int itemIndex) {

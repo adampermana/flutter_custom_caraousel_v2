@@ -41,7 +41,7 @@ abstract class BaseCarouselIndicator extends StatelessWidget {
 
 class CarouselIndicator extends BaseCarouselIndicator {
   const CarouselIndicator({
-    required this.style,
+    required this.styleIndicator,
     super.key,
     required super.count,
     required super.currentIndex,
@@ -62,7 +62,7 @@ class CarouselIndicator extends BaseCarouselIndicator {
   });
 
   /// The style of indicator to use
-  final StyleIndicator style;
+  final StyleIndicator styleIndicator;
 
   /// Base size for indicators
   final double size;
@@ -99,7 +99,7 @@ class CarouselIndicator extends BaseCarouselIndicator {
 
   @override
   Widget build(BuildContext context) {
-    switch (style) {
+    switch (styleIndicator) {
       case StyleIndicator.dotIndicator:
         return CarouselDotIndicator(
           count: count,

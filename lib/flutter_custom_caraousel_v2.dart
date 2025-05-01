@@ -22,38 +22,38 @@ part 'caraousel_indicator.dart';
 
 /// A Material Design carousel widget.
 ///
-/// The [CarouselView] presents a scrollable list of items, each of which can dynamically
+/// The [CarouselViewV2] presents a scrollable list of items, each of which can dynamically
 /// change size based on the chosen layout.
 ///
 /// Material Design 3 introduced 4 carousel layouts:
 ///  * Multi-browse: This layout shows at least one large, medium, and small
-///    carousel item at a time. This layout is supported by [CarouselView.weighted].
+///    carousel item at a time. This layout is supported by [CarouselViewV2.weighted].
 ///  * Uncontained (default): This layout show items that scroll to the edge of the
-///    container. This layout is supported by [CarouselView].
+///    container. This layout is supported by [CarouselViewV2].
 ///  * Hero: This layout shows at least one large and one small item at a time.
-///    This layout is supported by [CarouselView.weighted].
+///    This layout is supported by [CarouselViewV2.weighted].
 ///  * Full-screen: This layout shows one edge-to-edge large item at a time and
 ///    scrolls vertically. The full-screen layout can be supported by both
 ///    constructors.
 ///
 /// The default constructor implements the uncontained layout model. It shows
 /// items that scroll to the edge of the container, behaving similarly to a
-/// [ListView] where all children are a uniform size. [CarouselView.weighted]
+/// [ListView] where all children are a uniform size. [CarouselViewV2.weighted]
 /// enables dynamic item sizing. Each item is assigned a weight that determines
 /// the portion of the viewport it occupies. This constructor helps to create
 /// layouts like multi-browse, and hero. In order to have a full-screen layout,
-/// if [CarouselView] is used, then set the [itemExtent] to screen size; if
-/// [CarouselView.weighted] is used, then set the [flexWeights] to only have
+/// if [CarouselViewV2] is used, then set the [itemExtent] to screen size; if
+/// [CarouselViewV2.weighted] is used, then set the [flexWeights] to only have
 /// one integer in the array.
 ///
 /// {@tool snippet}
 ///
 /// This code snippet shows how to get a vertical full-screen carousel by using
-/// [itemExtent] in [CarouselView].
+/// [itemExtent] in [CarouselViewV2].
 ///
 /// ```dart
 /// Scaffold(
-///   body: CarouselView(
+///   body: CarouselViewV2(
 ///     scrollDirection: Axis.vertical,
 ///     itemExtent: double.infinity,
 ///     children: List<Widget>.generate(10, (int index) {
@@ -64,11 +64,11 @@ part 'caraousel_indicator.dart';
 /// ```
 ///
 /// This code snippet below shows how to achieve the same vertical full-screen
-/// carousel by using [flexWeights] in [CarouselView.weighted].
+/// carousel by using [flexWeights] in [CarouselViewV2.weighted].
 ///
 /// ```dart
 /// Scaffold(
-///   body: CarouselView.weighted(
+///   body: CarouselViewV2.weighted(
 ///     scrollDirection: Axis.vertical,
 ///     flexWeights: const <int>[1], // Or any positive integers as long as the length of the array is 1.
 ///     children: List<Widget>.generate(10, (int index) {
@@ -79,45 +79,45 @@ part 'caraousel_indicator.dart';
 /// ```
 /// {@end-tool}
 ///
-/// In [CarouselView.weighted], weights are relative proportions. For example,
+/// In [CarouselViewV2.weighted], weights are relative proportions. For example,
 /// if the layout weights is `[3, 2, 1]`, it means the first visible item occupies
 /// 3/6 of the viewport; the second visible item occupies 2/6 of the viewport;
 /// the last visible item occupies 1/6 of the viewport. As the carousel scrolls,
 /// the size of the latter one gradually changes to the size of the former one.
 /// As a result, when the first visible item is completely off-screen, the
-/// following items will follow the same layout as before. Using [CarouselView.weighted]
+/// following items will follow the same layout as before. Using [CarouselViewV2.weighted]
 /// helps build the multi-browse, hero, center-aligned hero and full-screen layouts,
 /// as indicated in [Carousel sepcs](https://m3.material.io/components/carousel/specs).
 ///
-/// The [CarouselController] is used to control the
-/// [CarouselController.initialItem], which determines the first fully expanded
-/// item when the [CarouselView] or [CarouselView.weighted] is initially displayed.
-/// This is straightforward for [CarouselView] because each item in the view
-/// has fixed size. In [CarouselView.weighted], for instance, if the layout
+/// The [CarouselControllerv2] is used to control the
+/// [CarouselControllerv2.initialItem], which determines the first fully expanded
+/// item when the [CarouselViewV2] or [CarouselViewV2.weighted] is initially displayed.
+/// This is straightforward for [CarouselViewV2] because each item in the view
+/// has fixed size. In [CarouselViewV2.weighted], for instance, if the layout
 /// weights are `[1, 2, 3, 2, 1]` and the initial item is 4 (the fourth item), the
 /// view will display items 2, 3, 4, 5, and 6 with weights 1, 2, 3, 2 and 1
 /// respectively.
 ///
-/// The [CarouselView.itemExtent] property must be non-null and defines the base
+/// The [CarouselViewV2.itemExtent] property must be non-null and defines the base
 /// size of items. While items typically maintain this size, the first and last
 /// visible items may be slightly compressed during scrolling. The [shrinkExtent]
 /// property controls the minimum allowable size for these compressed items.
 ///
 /// {@tool dartpad}
-/// Here is an example to show different carousel layouts that [CarouselView]
-/// and [CarouselView.weighted] can build.
+/// Here is an example to show different carousel layouts that [CarouselViewV2]
+/// and [CarouselViewV2.weighted] can build.
 ///
 /// ** See code in examples/api/lib/material/carousel/carousel.0.dart **
 /// {@end-tool}
 ///
 /// See also:
 ///
-///  * [CarouselController], which controls the first fully visible item in the
+///  * [CarouselControllerv2], which controls the first fully visible item in the
 ///    view.
 ///  * [PageView], which is a scrollable list that works page by page.
-class CarouselView extends StatefulWidget {
+class CarouselViewV2 extends StatefulWidget {
   /// Creates a Material Design carousel.
-  const CarouselView({
+  const CarouselViewV2({
     super.key,
     this.padding,
     this.backgroundColor,
@@ -180,7 +180,7 @@ class CarouselView extends StatefulWidget {
   /// is particularly useful for achieving [Hero](https://m3.material.io/components/carousel/specs#b33a5579-d648-42a9-b934-98718d65454f)
   /// and [Center-aligned hero](https://m3.material.io/components/carousel/specs#92c779ce-de8b-4dee-8201-95d3e429204f)
   /// layouts indicated in the Material Design 3.
-  const CarouselView.weighted({
+  const CarouselViewV2.weighted({
     super.key,
     this.padding,
     this.backgroundColor,
@@ -261,7 +261,7 @@ class CarouselView extends StatefulWidget {
 
   /// An object that can be used to control the position to which this scroll
   /// view is scrolled.
-  final CarouselController? controller;
+  final CarouselControllerv2? controller;
 
   /// The [Axis] along which the scroll view's offset increases with each item.
   ///
@@ -285,7 +285,7 @@ class CarouselView extends StatefulWidget {
   /// Whether the collapsed items are allowed to expand to the max size.
   ///
   /// If this is false, the layout of the carousel doesn't change. This is especially
-  /// useful when a weight list in [CarouselView.weighted] has a max item in the
+  /// useful when a weight list in [CarouselViewV2.weighted] has a max item in the
   /// middle and at least one small item on either side, such as `[1, 7, 1, 1]`.
   /// In this case, if this is false, the first and the last two items cannot
   /// expand to the max size. If this is true, there will be some space before
@@ -313,7 +313,7 @@ class CarouselView extends StatefulWidget {
   /// The item extent should not exceed the available space that the carousel view
   /// occupies to ensure at least one item is fully visible.
   ///
-  /// This is required for [CarouselView]. In [CarouselView.weighted], this is null.
+  /// This is required for [CarouselViewV2]. In [CarouselViewV2.weighted], this is null.
   final double? itemExtent;
 
   /// The weights that each visible child should occupy in the viewport.
@@ -323,8 +323,8 @@ class CarouselView extends StatefulWidget {
   /// `<int>[3, 2, 1]` means there are 3 carousel items and their extents are
   /// 3/6, 2/6 and 1/6 of the viewport extent.
   ///
-  /// This is a required property in [CarouselView.weighted]. This is null
-  /// for default [CarouselView]. The integers must be greater than 0.
+  /// This is a required property in [CarouselViewV2.weighted]. This is null
+  /// for default [CarouselViewV2]. The integers must be greater than 0.
   final List<int>? flexWeights;
 
   /// The child widgets for the carousel.
@@ -345,16 +345,16 @@ class CarouselView extends StatefulWidget {
   final Duration autoPlayInterval;
 
   @override
-  State<CarouselView> createState() => CarouselViewState();
+  State<CarouselViewV2> createState() => CarouselViewV2State();
 }
 
-class CarouselViewState extends State<CarouselView>
+class CarouselViewV2State extends State<CarouselViewV2>
     with SingleTickerProviderStateMixin {
   double? _itemExtent;
   List<int>? get _flexWeights => widget.flexWeights;
   bool get _consumeMaxWeight => widget.consumeMaxWeight;
-  CarouselController? _internalController;
-  CarouselController get _controller =>
+  CarouselControllerv2? _internalController;
+  CarouselControllerv2 get _controller =>
       widget.controller ?? _internalController!;
 
   Timer? _autoPlayTimer;
@@ -365,7 +365,7 @@ class CarouselViewState extends State<CarouselView>
     super.initState();
     _itemExtent = widget.itemExtent;
     if (widget.controller == null) {
-      _internalController = CarouselController();
+      _internalController = CarouselControllerv2();
     }
     _controller._attach(this);
 
@@ -375,7 +375,7 @@ class CarouselViewState extends State<CarouselView>
   }
 
   @override
-  void didUpdateWidget(covariant CarouselView oldWidget) {
+  void didUpdateWidget(covariant CarouselViewV2 oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
       oldWidget.controller?._detach(this);
@@ -386,7 +386,7 @@ class CarouselViewState extends State<CarouselView>
       } else {
         // widget.controller == null && oldWidget.controller != null
         assert(_internalController == null);
-        _internalController = CarouselController();
+        _internalController = CarouselControllerv2();
         _controller._attach(this);
       }
     }
@@ -871,7 +871,7 @@ class _RenderSliverFixedExtentCarousel
 /// weight along the main axis and to the [SliverConstraints.crossAxisExtent]
 /// along the cross axis.
 ///
-/// See [CarouselView.weighted] to get more calculation explanations.
+/// See [CarouselViewV2.weighted] to get more calculation explanations.
 class _SliverWeightedCarousel extends SliverMultiBoxAdaptorWidget {
   const _SliverWeightedCarousel({
     required super.delegate,
@@ -1373,7 +1373,7 @@ class _RenderSliverWeightedCarousel extends RenderSliverFixedExtentBoxAdaptor {
   ItemExtentBuilder? get itemExtentBuilder => _buildItemExtent;
 }
 
-/// Scroll physics used by a [CarouselView].
+/// Scroll physics used by a [CarouselViewV2].
 ///
 /// These physics cause the carousel item to snap to item boundaries.
 ///
@@ -1383,7 +1383,7 @@ class _RenderSliverWeightedCarousel extends RenderSliverFixedExtentBoxAdaptor {
 ///    physics.
 ///  * [PageScrollPhysics], scroll physics used by a [PageView].
 class CarouselScrollPhysics extends ScrollPhysics {
-  /// Creates physics for a [CarouselView].
+  /// Creates physics for a [CarouselViewV2].
   const CarouselScrollPhysics({super.parent});
 
   @override
@@ -1458,9 +1458,9 @@ class CarouselScrollPhysics extends ScrollPhysics {
   bool get allowImplicitScrolling => true;
 }
 
-/// Metrics for a [CarouselView].
+/// Metrics for a [CarouselViewV2].
 class _CarouselMetrics extends FixedScrollMetrics {
-  /// Creates an immutable snapshot of values associated with a [CarouselView].
+  /// Creates an immutable snapshot of values associated with a [CarouselViewV2].
   _CarouselMetrics({
     required super.minScrollExtent,
     required super.maxScrollExtent,

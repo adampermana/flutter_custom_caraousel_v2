@@ -15,7 +15,7 @@ void main() {
               body: Column(
                 children: [
                   Expanded(
-                    child: CarouselView(
+                    child: CarouselViewV2(
                       itemExtent: 200,
                       autoPlay: autoPlay,
                       autoPlayInterval: const Duration(seconds: 1),
