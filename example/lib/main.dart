@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_caraousel_v2/flutter_custom_caraousel_v2.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,119 +8,255 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Carousel Sederhana',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const CarouselDemo(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class CarouselDemo extends StatefulWidget {
+  const CarouselDemo({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<CarouselDemo> createState() => _CarouselDemoState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _CarouselDemoState extends State<CarouselDemo> {
+  // Buat controller untuk carousel
+  final CarouselController _carouselController =
+      CarouselController(initialItem: 1);
+  int _currentIndex = 0; // Untuk melacak indeks saat ini
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+  final List<Map<String, dynamic>> _carouselItems = [
+    {
+      'title': 'Mountain Landscape',
+      'color': Colors.blue,
+      'icon': Icons.landscape,
+    },
+    {
+      'title': 'Urban Cityscape',
+      'color': Colors.orange,
+      'icon': Icons.location_city,
+    },
+    {
+      'title': 'Beach Sunset',
+      'color': Colors.pink,
+      'icon': Icons.beach_access,
+    },
+    {
+      'title': 'Forest Adventure',
+      'color': Colors.green,
+      'icon': Icons.forest,
+    },
+    {
+      'title': 'Desert Journey',
+      'color': Colors.amber,
+      'icon': Icons.terrain,
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Opsional: Mendengarkan perubahan posisi pada controller
+    // untuk mengupdate _currentIndex
+    _carouselController.addListener(() {
+      if (_carouselController.hasClients &&
+          _carouselController.currentItem != null &&
+          _carouselController.currentItem != _currentIndex) {
+        setState(() {
+          _currentIndex = _carouselController.currentItem!;
+        });
+      }
     });
   }
 
   @override
+  void dispose() {
+    _carouselController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Carousel dengan Controller'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: Column(
+        children: [
+          // Carousel dengan controller
+          Expanded(
+            flex: 3,
+            child: CarouselView(
+              itemExtent: 300, // Lebar item
+              controller: _carouselController, // Gunakan controller
+              autoPlay: true, // Aktifkan autoplay
+              autoPlayInterval: const Duration(seconds: 3),
+              indicator: CarouselIndicator(
+                count: _carouselItems.length,
+                style: StyleIndicator.dotIndicator,
+                currentIndex: _currentIndex, // Gunakan _currentIndex
+                activeColor: Colors.blue,
+                inactiveColor: Colors.grey.withOpacity(0.5),
+                size: 10.0,
+                activeSize: 14.0,
+                spacing: 8.0,
+                enableAnimation: true,
+              ),
+              onTap: (index) {
+                // Update state dan tampilkan pesan
+                setState(() {
+                  _currentIndex = index;
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Anda mengklik slide ${index + 1}'),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
+              children: _buildCarouselItems(),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          ),
+
+          // Kontrol untuk carousel
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Tombol previous
+                ElevatedButton(
+                  onPressed: () {
+                    if (_currentIndex > 0) {
+                      _carouselController.animateToItem(
+                        _currentIndex - 1,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  },
+                  child: const Icon(Icons.arrow_back),
+                ),
+
+                const SizedBox(width: 20),
+
+                // Indikator posisi saat ini
+                Text(
+                  'Slide ${_currentIndex + 1} dari ${_carouselItems.length}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(width: 20),
+
+                // Tombol next
+                ElevatedButton(
+                  onPressed: () {
+                    if (_currentIndex < _carouselItems.length - 1) {
+                      _carouselController.animateToItem(
+                        _currentIndex + 1,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  },
+                  child: const Icon(Icons.arrow_forward),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          // Tombol kontrol tambahan
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Pergi ke slide pertama
+                    _carouselController.animateToItem(
+                      0,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: const Text('Awal'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Pergi ke slide tengah
+                    _carouselController.animateToItem(
+                      _carouselItems.length ~/ 2,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: const Text('Tengah'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Pergi ke slide terakhir
+                    _carouselController.animateToItem(
+                      _carouselItems.length - 1,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: const Text('Akhir'),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  List<Widget> _buildCarouselItems() {
+    return _carouselItems.map((item) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4.0),
+        decoration: BoxDecoration(
+          color: item['color'] as Color,
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                item['icon'] as IconData,
+                size: 80,
+                color: Colors.white,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                item['title'] as String,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }).toList();
   }
 }

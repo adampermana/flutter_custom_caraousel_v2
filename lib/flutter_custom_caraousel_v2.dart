@@ -5,6 +5,7 @@
 // library;
 library flutter_custom_caraousel_v2;
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
@@ -13,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 part 'controller/controller_caraousel.dart';
+part 'caraousel_indicator.dart';
+// part 'caraousel_view_indicator.dart';
 
 // Examples can assume:
 // late BuildContext context;
@@ -128,6 +131,9 @@ class CarouselView extends StatefulWidget {
     this.reverse = false,
     this.onTap,
     this.enableSplash = true,
+    this.indicator,
+    this.autoPlay = false,
+    this.autoPlayInterval = const Duration(seconds: 5),
     required double this.itemExtent,
     required this.children,
   })  : consumeMaxWeight = true,
@@ -189,6 +195,9 @@ class CarouselView extends StatefulWidget {
     this.consumeMaxWeight = true,
     this.onTap,
     this.enableSplash = true,
+    this.indicator,
+    this.autoPlay = false,
+    this.autoPlayInterval = const Duration(seconds: 5),
     required List<int> this.flexWeights,
     required this.children,
   }) : itemExtent = null;
@@ -321,17 +330,35 @@ class CarouselView extends StatefulWidget {
   /// The child widgets for the carousel.
   final List<Widget> children;
 
+  /// The indicator widget for displaying the current item position.
+  final CarouselIndicator? indicator;
+  // final Widget? indicator;
+
+  /// Enables auto play, sliding one page at a time.
+  /// Use [autoPlayInterval] to determine the frequency of slides.
+  /// Defaults to false.
+  final bool autoPlay;
+
+  /// Sets Duration to determine the frequency of slides when
+  /// [autoPlay] is set to true.
+  /// Defaults to 5 seconds.
+  final Duration autoPlayInterval;
+
   @override
   State<CarouselView> createState() => CarouselViewState();
 }
 
-class CarouselViewState extends State<CarouselView> {
+class CarouselViewState extends State<CarouselView>
+    with SingleTickerProviderStateMixin {
   double? _itemExtent;
   List<int>? get _flexWeights => widget.flexWeights;
   bool get _consumeMaxWeight => widget.consumeMaxWeight;
   CarouselController? _internalController;
   CarouselController get _controller =>
       widget.controller ?? _internalController!;
+
+  Timer? _autoPlayTimer;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -341,6 +368,10 @@ class CarouselViewState extends State<CarouselView> {
       _internalController = CarouselController();
     }
     _controller._attach(this);
+
+    if (widget.autoPlay) {
+      _startAutoPlay();
+    }
   }
 
   @override
@@ -370,13 +401,60 @@ class CarouselViewState extends State<CarouselView> {
       (_controller.position as _CarouselPosition).consumeMaxWeight =
           _consumeMaxWeight;
     }
+    // Handle changes in autoPlay
+    if (widget.autoPlay != oldWidget.autoPlay) {
+      if (widget.autoPlay) {
+        _startAutoPlay();
+      } else {
+        _stopAutoPlay();
+      }
+    }
+    // Handle changes in autoPlayInterval when autoPlay is active
+    if (widget.autoPlay &&
+        widget.autoPlayInterval != oldWidget.autoPlayInterval) {
+      _restartAutoPlay();
+    }
   }
 
   @override
   void dispose() {
+    _stopAutoPlay();
     _controller._detach(this);
     _internalController?.dispose();
     super.dispose();
+  }
+
+  void _startAutoPlay() {
+    _autoPlayTimer?.cancel();
+    _autoPlayTimer = Timer.periodic(widget.autoPlayInterval, (timer) {
+      if (!mounted) {
+        _stopAutoPlay();
+        return;
+      }
+
+      // Calculate the next index
+      final currentItem = _controller.currentItem;
+      if (currentItem == null) return;
+
+      _currentIndex = currentItem;
+      final nextIndex = (_currentIndex + 1) % widget.children.length;
+
+      _controller.animateToItem(
+        nextIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _stopAutoPlay() {
+    _autoPlayTimer?.cancel();
+    _autoPlayTimer = null;
+  }
+
+  void _restartAutoPlay() {
+    _stopAutoPlay();
+    _startAutoPlay();
   }
 
   AxisDirection _getDirection(BuildContext context) {
@@ -427,7 +505,18 @@ class CarouselViewState extends State<CarouselView> {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => widget.onTap?.call(index),
+              onTap: () {
+                widget.onTap?.call(index);
+                // Pause autoplay briefly when user taps
+                if (widget.autoPlay) {
+                  _stopAutoPlay();
+                  Future.delayed(const Duration(seconds: 3), () {
+                    if (mounted && widget.autoPlay) {
+                      _startAutoPlay();
+                    }
+                  });
+                }
+              },
               overlayColor: effectiveOverlayColor,
             ),
           ),
@@ -435,7 +524,18 @@ class CarouselViewState extends State<CarouselView> {
       );
     } else if (widget.onTap != null) {
       contents = GestureDetector(
-        onTap: () => widget.onTap!(index),
+        onTap: () {
+          widget.onTap!(index);
+          // Pause autoplay briefly when user taps
+          if (widget.autoPlay) {
+            _stopAutoPlay();
+            Future.delayed(const Duration(seconds: 3), () {
+              if (mounted && widget.autoPlay) {
+                _startAutoPlay();
+              }
+            });
+          }
+        },
         child: contents,
       );
     }
@@ -500,23 +600,66 @@ class CarouselViewState extends State<CarouselView> {
           ? _itemExtent
           : clampDouble(_itemExtent!, 0, mainAxisExtent);
 
-      return Scrollable(
-        axisDirection: axisDirection,
-        controller: _controller,
-        physics: physics,
-        viewportBuilder: (BuildContext context, ViewportOffset position) {
-          return Viewport(
-            cacheExtent: 0.0,
-            cacheExtentStyle: CacheExtentStyle.viewport,
-            axisDirection: axisDirection,
-            offset: position,
-            clipBehavior: Clip.antiAlias,
-            slivers: <Widget>[
-              _buildSliverCarousel(theme),
-            ],
-          );
+      // Build the carousel with indicator
+      final carousel = NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification notification) {
+          if (notification is ScrollUpdateNotification &&
+              notification.depth == 0 &&
+              _controller.hasClients) {
+            // Update current index based on scroll position
+            final currentItem = _controller.currentItem;
+            if (currentItem != null && currentItem != _currentIndex) {
+              setState(() {
+                _currentIndex = currentItem;
+              });
+            }
+
+            // Temporarily pause autoplay during manual scrolling
+            if (widget.autoPlay && _autoPlayTimer != null) {
+              _stopAutoPlay();
+              // Resume autoplay after a brief pause
+              Future.delayed(const Duration(seconds: 2), () {
+                if (mounted && widget.autoPlay) {
+                  _startAutoPlay();
+                }
+              });
+            }
+          }
+          return false;
         },
+        child: Scrollable(
+          axisDirection: axisDirection,
+          controller: _controller,
+          physics: physics,
+          viewportBuilder: (BuildContext context, ViewportOffset position) {
+            return Viewport(
+              cacheExtent: 0.0,
+              cacheExtentStyle: CacheExtentStyle.viewport,
+              axisDirection: axisDirection,
+              offset: position,
+              clipBehavior: Clip.antiAlias,
+              slivers: <Widget>[
+                _buildSliverCarousel(theme),
+              ],
+            );
+          },
+        ),
       );
+
+      // If indicator is provided, include it
+      if (widget.indicator != null) {
+        return Column(
+          children: [
+            Expanded(child: carousel),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: widget.indicator,
+            ),
+          ],
+        );
+      }
+
+      return carousel;
     });
   }
 }

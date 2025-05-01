@@ -49,4 +49,58 @@ class CarouselController extends ScrollController {
     carouselPosition.itemExtent = _carouselState!._itemExtent;
     carouselPosition.consumeMaxWeight = _carouselState!._consumeMaxWeight;
   }
+
+  /// Animates the controlled [CarouselView] to the given item index.
+  ///
+  /// The animation lasts for the given duration and follows the given curve.
+  /// The returned [Future] resolves when the animation completes.
+  ///
+  /// The `duration` and `curve` arguments must not be null.
+  Future<void> animateToItem(
+    int itemIndex, {
+    required Duration duration,
+    required Curve curve,
+  }) async {
+    if (!hasClients) {
+      return;
+    }
+
+    final _CarouselPosition carouselPosition = position as _CarouselPosition;
+    double pixel = carouselPosition.getPixelsFromItem(itemIndex.toDouble(),
+        carouselPosition.flexWeights, carouselPosition.itemExtent);
+
+    return animateTo(
+      pixel,
+      duration: duration,
+      curve: curve,
+    );
+  }
+
+  /// Jumps the controlled [CarouselView] to the given item index.
+  ///
+  /// This is an instantaneous movement to the given item.
+  void jumpToItem(int itemIndex) {
+    if (!hasClients) {
+      return;
+    }
+
+    final _CarouselPosition carouselPosition = position as _CarouselPosition;
+    double pixel = carouselPosition.getPixelsFromItem(itemIndex.toDouble(),
+        carouselPosition.flexWeights, carouselPosition.itemExtent);
+
+    jumpTo(pixel);
+  }
+
+  /// Returns the current visible item index
+  int? get currentItem {
+    if (!hasClients) {
+      return null;
+    }
+
+    final _CarouselPosition carouselPosition = position as _CarouselPosition;
+    return carouselPosition
+        .getItemFromPixels(
+            carouselPosition.pixels, carouselPosition.viewportDimension)
+        .round();
+  }
 }
