@@ -1,30 +1,123 @@
-// // This is a basic Flutter widget test.
-// //
-// // To perform an interaction with a widget in your test, use the WidgetTester
-// // utility in the flutter_test package. For example, you can send tap and scroll
-// // gestures. You can also use WidgetTester to find child widgets in the widget
-// // tree, read text, and verify that the values of widget properties are correct.
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_custom_caraousel_v2/flutter_custom_caraousel_v2.dart';
 
-// import 'package:flutter/material.dart';
-// import 'package:flutter_test/flutter_test.dart';
+void main() {
+  testWidgets('CarouselView with all indicator styles',
+      (WidgetTester tester) async {
+    for (final style in StyleIndicator.values) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                Expanded(
+                  child: CarouselView(
+                    itemExtent: 200,
+                    children: List.generate(
+                      5,
+                      (index) => Container(
+                        color:
+                            Colors.primaries[index % Colors.primaries.length],
+                        child: Center(
+                          child: Text('Item $index'),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: CarouselIndicator(
+                    style: style,
+                    count: 5,
+                    currentIndex: 2,
+                    activeColor: Colors.blue,
+                    inactiveColor: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
 
-// import 'package:example/main.dart';
+      // Verify the indicator is rendered
+      expect(find.byType(CarouselIndicator), findsOneWidget);
+      await tester.pumpAndSettle();
+    }
+  });
 
-// void main() {
-//   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-//     // Build our app and trigger a frame.
-//     await tester.pumpWidget(const MyApp());
+  testWidgets('CarouselView with vertical scrolling',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CarouselView(
+            itemExtent: 200,
+            scrollDirection: Axis.vertical,
+            indicator: const CarouselIndicator(
+              style: StyleIndicator.dotIndicator,
+              count: 5,
+              currentIndex: 0,
+              activeColor: Colors.blue,
+              inactiveColor: Colors.grey,
+            ),
+            children: List.generate(
+              5,
+              (index) => Container(
+                color: Colors.primaries[index % Colors.primaries.length],
+                child: Center(
+                  child: Text('Item $index'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
 
-//     // Verify that our counter starts at 0.
-//     expect(find.text('0'), findsOneWidget);
-//     expect(find.text('1'), findsNothing);
+    expect(find.text('Item 0'), findsOneWidget);
 
-//     // Tap the '+' icon and trigger a frame.
-//     await tester.tap(find.byIcon(Icons.add));
-//     await tester.pump();
+    // Simulate vertical scroll
+    await tester.drag(find.byType(CarouselView), const Offset(0, -300));
+    await tester.pumpAndSettle();
 
-//     // Verify that our counter has incremented.
-//     expect(find.text('0'), findsNothing);
-//     expect(find.text('1'), findsOneWidget);
-//   });
-// }
+    // Item 1 should be visible after scrolling
+    expect(find.text('Item 1'), findsOneWidget);
+  });
+
+  testWidgets('CarouselView responds to tap events',
+      (WidgetTester tester) async {
+    int tappedIndex = -1;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CarouselView(
+            itemExtent: 200,
+            onTap: (index) {
+              tappedIndex = index;
+            },
+            children: List.generate(
+              5,
+              (index) => Container(
+                color: Colors.primaries[index % Colors.primaries.length],
+                child: Center(
+                  child: Text('Item $index'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Tap on the first item
+    await tester.tap(find.text('Item 0'));
+    await tester.pumpAndSettle();
+
+    // Verify the onTap callback was called with the correct index
+    expect(tappedIndex, 0);
+  });
+}
