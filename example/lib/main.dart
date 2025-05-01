@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_caraousel_v2/flutter_custom_caraousel_v2.dart';
 
@@ -35,15 +36,6 @@ class CarouselDemoHomePage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildDemoCard(
-            context,
-            title: 'Standard Carousel',
-            subtitle: 'Carousel with uniform item sizes',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const StandardCarouselDemo()),
-            ),
-          ),
           _buildDemoCard(
             context,
             title: 'Weighted Carousel',
@@ -194,10 +186,40 @@ class DemoData {
       icon: Icons.water,
     ),
     CarouselItemData(
-      title: 'City',
-      description: 'Kota yang Modern',
+      title: 'Modern City',
+      description: 'Kota yang modern dan penuh teknologi',
       color: Colors.brown.shade800,
       icon: Icons.location_city_rounded,
+    ),
+    CarouselItemData(
+      title: 'Village',
+      description: 'Desa yang asri dengan suasana tenang dan damai',
+      color: Colors.lightGreen.shade800,
+      icon: Icons.home,
+    ),
+    CarouselItemData(
+      title: 'Cave',
+      description: 'Gua tersembunyi yang eksotis dan misterius',
+      color: Colors.grey.shade800,
+      icon: Icons.cabin,
+    ),
+    CarouselItemData(
+      title: 'River',
+      description: 'Sungai yang mengalir jernih di antara hutan tropis',
+      color: Colors.indigo.shade800,
+      icon: Icons.waves,
+    ),
+    CarouselItemData(
+      title: 'Snow',
+      description: 'Wilayah bersalju dengan salju putih yang menyelimuti',
+      color: Colors.lightBlue.shade800,
+      icon: Icons.ac_unit,
+    ),
+    CarouselItemData(
+      title: 'Island',
+      description: 'Pulau terpencil dengan pantai alami dan hutan tropis',
+      color: Colors.deepOrange.shade800,
+      icon: Icons.public,
     ),
   ];
 }
@@ -278,7 +300,7 @@ class StandardCarouselDemo extends StatefulWidget {
 
 class _StandardCarouselDemoState extends State<StandardCarouselDemo> {
   final CarouselControllerv2 _carouselController =
-      CarouselControllerv2(initialItem: 1);
+      CarouselControllerv2(initialItem: 0);
   int _currentIndex = 0; // Untuk melacak indeks saat ini
   @override
   void initState() {
@@ -305,6 +327,9 @@ class _StandardCarouselDemoState extends State<StandardCarouselDemo> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Standard Carousel'),
@@ -312,10 +337,12 @@ class _StandardCarouselDemoState extends State<StandardCarouselDemo> {
       ),
       body: Column(
         children: [
-          Expanded(
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: kIsWeb ? height / 1.8 : 220),
             child: CarouselViewV2(
               controller: _carouselController,
-              itemExtent: 300,
+              itemExtent: kIsWeb ? width * 0.6 : width * 0.9,
+              isWeb: kIsWeb,
               indicator: CarouselIndicator(
                 styleIndicator: StyleIndicator.dotIndicator,
                 count: DemoData.items.length,
@@ -436,12 +463,6 @@ class _WeightedCarouselDemoState extends State<WeightedCarouselDemo> {
                             setState(() {
                               _selectedWeightIndex = index;
                             });
-                            // Pindah ke awal carousel setiap kali bobot diganti
-                            // _carouselController.animateToPage(
-                            //   0,
-                            //   duration: const Duration(milliseconds: 300),
-                            //   curve: Curves.easeInOut,
-                            // );
                           }
                         },
                       );
@@ -456,6 +477,7 @@ class _WeightedCarouselDemoState extends State<WeightedCarouselDemo> {
           Expanded(
             child: CarouselViewV2.weighted(
               controller: _carouselController,
+              isWeb: kIsWeb,
               flexWeights: _weightOptions[_selectedWeightIndex],
               indicator: CarouselIndicator(
                 styleIndicator: StyleIndicator.dotIndicator,
@@ -504,7 +526,8 @@ class _AutoPlayDemoState extends State<AutoPlayDemo> {
   bool _autoPlay = true;
   Duration _interval = const Duration(seconds: 3);
   int _currentIndex = 0;
-  final CarouselControllerv2 _carouselController = CarouselControllerv2();
+  final CarouselControllerv2 _carouselController =
+      CarouselControllerv2(initialItem: 0);
 
   @override
   void initState() {
@@ -531,6 +554,9 @@ class _AutoPlayDemoState extends State<AutoPlayDemo> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('AutoPlay Demo'),
@@ -539,30 +565,34 @@ class _AutoPlayDemoState extends State<AutoPlayDemo> {
       body: Column(
         children: [
           Expanded(
-            child: CarouselViewV2(
-              itemExtent: 300,
-              controller: _carouselController,
-              autoPlay: _autoPlay,
-              autoPlayInterval: _interval,
-              indicator: CarouselIndicator(
-                styleIndicator: StyleIndicator.expandingDotIndicator,
-                count: DemoData.items.length,
-                currentIndex: _currentIndex,
-                activeColor: Theme.of(context).colorScheme.primary,
-                inactiveColor: Colors.grey.withOpacity(0.5),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: kIsWeb ? height / 1 : 220),
+              child: CarouselViewV2(
+                itemExtent: kIsWeb ? width * 0.7 : 300,
+                controller: _carouselController,
+                autoPlay: _autoPlay,
+                isWeb: kIsWeb,
+                autoPlayInterval: _interval,
+                indicator: CarouselIndicator(
+                  styleIndicator: StyleIndicator.expandingDotIndicator,
+                  count: DemoData.items.length,
+                  currentIndex: _currentIndex,
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  inactiveColor: Colors.grey.withOpacity(0.5),
+                ),
+                onTap: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Tapped on ${DemoData.items[index].title}'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                },
+                children: buildCarouselItems(DemoData.items),
               ),
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Tapped on ${DemoData.items[index].title}'),
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
-              },
-              children: buildCarouselItems(DemoData.items),
             ),
           ),
 
@@ -911,6 +941,8 @@ class _ControllerDemoState extends State<ControllerDemo> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Controller Demo'),
@@ -921,7 +953,8 @@ class _ControllerDemoState extends State<ControllerDemo> {
           // Carousel with controller
           Expanded(
             child: CarouselViewV2(
-              itemExtent: 300,
+              itemExtent: kIsWeb ? width * 0.7 : 300,
+              isWeb: kIsWeb,
               controller: _carouselController,
               indicator: CarouselIndicator(
                 styleIndicator: StyleIndicator.dotIndicator,
@@ -1071,14 +1104,13 @@ class LayoutVariationsDemo extends StatefulWidget {
 }
 
 enum LayoutType {
-  standard,
   hero,
   multiBrowse,
   fullScreen,
 }
 
 class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
-  LayoutType _currentLayout = LayoutType.standard;
+  LayoutType _currentLayout = LayoutType.hero;
   int _currentIndex = 0;
   final CarouselControllerv2 _carouselController = CarouselControllerv2();
 
@@ -1130,7 +1162,6 @@ class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildLayoutOption(LayoutType.standard, 'Standard'),
                       const SizedBox(width: 8),
                       _buildLayoutOption(LayoutType.hero, 'Hero'),
                       const SizedBox(width: 8),
@@ -1229,8 +1260,6 @@ class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
 
   String _getLayoutDescription() {
     switch (_currentLayout) {
-      case LayoutType.standard:
-        return 'Standard: All items have the same size as a regular ListView.';
       case LayoutType.hero:
         return 'Hero: One large item in the middle with small items next to it [1, 5, 1]';
       case LayoutType.multiBrowse:
@@ -1242,29 +1271,11 @@ class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
 
   Widget _buildCurrentLayoutCarousel() {
     switch (_currentLayout) {
-      case LayoutType.standard:
-        return CarouselViewV2(
-          itemExtent: 300,
-          controller: _carouselController,
-          indicator: CarouselIndicator(
-            styleIndicator: StyleIndicator.dotIndicator,
-            count: DemoData.items.length,
-            currentIndex: _currentIndex,
-            activeColor: Theme.of(context).colorScheme.primary,
-            inactiveColor: Colors.grey.withOpacity(0.5),
-          ),
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          children: buildCarouselItems(DemoData.items),
-        );
-
       case LayoutType.hero:
         return CarouselViewV2.weighted(
-          flexWeights: const [1, 5, 1],
+          flexWeights: const [1, 1, 1, 2, 3, 5, 5, 3, 2, 1, 1, 1],
           controller: _carouselController,
+          isWeb: kIsWeb,
           indicator: CarouselIndicator(
             styleIndicator: StyleIndicator.dotIndicator,
             count: DemoData.items.length,
@@ -1282,8 +1293,9 @@ class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
 
       case LayoutType.multiBrowse:
         return CarouselViewV2.weighted(
-          flexWeights: const [1, 2, 3, 2, 1],
+          flexWeights: const [2, 3, 2],
           controller: _carouselController,
+          isWeb: kIsWeb,
           indicator: CarouselIndicator(
             styleIndicator: StyleIndicator.dotIndicator,
             count: DemoData.items.length,
@@ -1303,6 +1315,7 @@ class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
         return CarouselViewV2.weighted(
           flexWeights: const [1],
           controller: _carouselController,
+          isWeb: kIsWeb,
           indicator: CarouselIndicator(
             styleIndicator: StyleIndicator.dotIndicator,
             count: DemoData.items.length,
@@ -1361,6 +1374,41 @@ class _CustomDemoState extends State<CustomDemo>
       'title': 'Media',
       'color': Colors.indigo.shade50,
     },
+    {
+      'icon': Icons.lock,
+      'title': 'Security',
+      'color': Colors.purple.shade50,
+    },
+    {
+      'icon': Icons.speaker,
+      'title': 'Audio',
+      'color': Colors.deepOrange.shade50,
+    },
+    {
+      'icon': Icons.kitchen,
+      'title': 'Appliances',
+      'color': Colors.cyan.shade50,
+    },
+    {
+      'icon': Icons.bolt,
+      'title': 'Energy',
+      'color': Colors.yellow.shade50,
+    },
+    {
+      'icon': Icons.water_damage,
+      'title': 'Water Leak',
+      'color': Colors.lightBlue.shade50,
+    },
+    {
+      'icon': Icons.bed,
+      'title': 'Bedroom',
+      'color': Colors.pink.shade50,
+    },
+    {
+      'icon': Icons.garage,
+      'title': 'Garage',
+      'color': Colors.brown.shade50,
+    },
   ];
 
   final List<String> _shows = [
@@ -1369,6 +1417,13 @@ class _CustomDemoState extends State<CustomDemo>
     'Show 2',
     'Show 3',
     'Show 4',
+    'Show 5',
+    'Show 6',
+    'Show 7',
+    'Show 8',
+    'Show 9',
+    'Show 10',
+    'Show 11',
   ];
 
   @override
@@ -1432,11 +1487,22 @@ class _CustomDemoState extends State<CustomDemo>
         SizedBox(
           height: 180,
           child: CarouselViewV2.weighted(
+            isWeb: kIsWeb,
             flexWeights: const [2, 4, 2],
             children: [
               _buildFeaturedItem('The\nGarden', Colors.green.shade100),
               _buildFeaturedItem('Through\nthe Pane', Colors.grey.shade100),
               _buildFeaturedItem('Iridescent\nLight', Colors.pink.shade100),
+              _buildFeaturedItem('Whispers\nof Dawn', Colors.blue.shade100),
+              _buildFeaturedItem('Echoes\nin Mist', Colors.indigo.shade100),
+              _buildFeaturedItem('Refraction\nDreams', Colors.amber.shade100),
+              _buildFeaturedItem('Silent\nSymphony', Colors.teal.shade100),
+              _buildFeaturedItem(
+                  'Twilight\nMemoirs', Colors.deepOrange.shade100),
+              _buildFeaturedItem('Golden\nPathways', Colors.lime.shade100),
+              _buildFeaturedItem('Frozen\nElegy', Colors.cyan.shade100),
+              _buildFeaturedItem('Shattered\nReflections', Colors.red.shade100),
+              _buildFeaturedItem('Serenity\nBound', Colors.purple.shade100),
             ],
           ),
         ),
@@ -1461,6 +1527,7 @@ class _CustomDemoState extends State<CustomDemo>
           height: 40,
           child: CarouselViewV2.weighted(
             flexWeights: const [3, 5, 7, 5, 3],
+            isWeb: kIsWeb,
             shrinkExtent: 20,
             padding: EdgeInsets.zero,
             children: [
@@ -1596,6 +1663,7 @@ class _CustomDemoState extends State<CustomDemo>
           height: 150,
           child: CarouselViewV2(
             itemExtent: 200,
+            isWeb: kIsWeb,
             padding: const EdgeInsets.symmetric(horizontal: 8),
             controller: _carouselController,
             indicator: CarouselIndicator(
@@ -1753,7 +1821,8 @@ class _VerticalCarouselDemoState extends State<VerticalCarouselDemo> {
           // Vertical carousel
           Expanded(
             child: CarouselViewV2(
-              itemExtent: 250,
+              itemExtent: 500,
+              isWeb: kIsWeb,
               scrollDirection: Axis.vertical,
               controller: _carouselController,
               onTap: (index) {

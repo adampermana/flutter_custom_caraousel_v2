@@ -10,6 +10,7 @@ import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -135,6 +136,7 @@ class CarouselViewV2 extends StatefulWidget {
     this.autoPlay = false,
     this.autoPlayInterval = const Duration(seconds: 5),
     required double this.itemExtent,
+    this.isWeb = false, // Added isWeb parameter
     required this.children,
   })  : consumeMaxWeight = true,
         flexWeights = null;
@@ -199,6 +201,7 @@ class CarouselViewV2 extends StatefulWidget {
     this.autoPlay = false,
     this.autoPlayInterval = const Duration(seconds: 5),
     required List<int> this.flexWeights,
+    this.isWeb = false, // Added isWeb parameter
     required this.children,
   }) : itemExtent = null;
 
@@ -343,6 +346,15 @@ class CarouselViewV2 extends StatefulWidget {
   /// [autoPlay] is set to true.
   /// Defaults to 5 seconds.
   final Duration autoPlayInterval;
+
+  /// Whether to enable web-specific handling for mouse wheel events.
+  ///
+  /// When set to true, the carousel adds support for mouse wheel
+  /// scrolling on web platforms, improving the user experience on desktop browsers.
+  /// This doesn't affect mobile or desktop apps.
+  ///
+  /// Defaults to false.
+  final bool isWeb;
 
   @override
   State<CarouselViewV2> createState() => CarouselViewV2State();
@@ -591,76 +603,183 @@ class CarouselViewV2State extends State<CarouselViewV2>
         : ScrollConfiguration.of(context).getScrollPhysics(context);
 
     return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      final double mainAxisExtent = switch (widget.scrollDirection) {
-        Axis.horizontal => constraints.maxWidth,
-        Axis.vertical => constraints.maxHeight,
-      };
-      _itemExtent = _itemExtent == null
-          ? _itemExtent
-          : clampDouble(_itemExtent!, 0, mainAxisExtent);
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double mainAxisExtent = switch (widget.scrollDirection) {
+          Axis.horizontal => constraints.maxWidth,
+          Axis.vertical => constraints.maxHeight,
+        };
+        _itemExtent = _itemExtent == null
+            ? _itemExtent
+            : clampDouble(_itemExtent!, 0, mainAxisExtent);
 
-      // Build the carousel with indicator
-      final carousel = NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification notification) {
-          if (notification is ScrollUpdateNotification &&
-              notification.depth == 0 &&
-              _controller.hasClients) {
-            // Update current index based on scroll position
-            final currentItem = _controller.currentItem;
-            if (currentItem != null && currentItem != _currentIndex) {
-              setState(() {
-                _currentIndex = currentItem;
-              });
-            }
+        // Build the base carousel
+        Widget carousel = NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification notification) {
+            if (notification is ScrollUpdateNotification &&
+                notification.depth == 0 &&
+                _controller.hasClients) {
+              // Update current index based on scroll position
+              final currentItem = _controller.currentItem;
+              if (currentItem != null && currentItem != _currentIndex) {
+                setState(() {
+                  _currentIndex = currentItem;
+                });
+              }
 
-            // Temporarily pause autoplay during manual scrolling
-            if (widget.autoPlay && _autoPlayTimer != null) {
-              _stopAutoPlay();
-              // Resume autoplay after a brief pause
-              Future.delayed(const Duration(seconds: 2), () {
-                if (mounted && widget.autoPlay) {
-                  _startAutoPlay();
-                }
-              });
+              // Temporarily pause autoplay during manual scrolling
+              if (widget.autoPlay && _autoPlayTimer != null) {
+                _stopAutoPlay();
+                // Resume autoplay after a brief pause
+                Future.delayed(const Duration(seconds: 2), () {
+                  if (mounted && widget.autoPlay) {
+                    _startAutoPlay();
+                  }
+                });
+              }
             }
-          }
-          return false;
-        },
-        child: Scrollable(
-          axisDirection: axisDirection,
-          controller: _controller,
-          physics: physics,
-          viewportBuilder: (BuildContext context, ViewportOffset position) {
-            return Viewport(
-              cacheExtent: 0.0,
-              cacheExtentStyle: CacheExtentStyle.viewport,
-              axisDirection: axisDirection,
-              offset: position,
-              clipBehavior: Clip.antiAlias,
-              slivers: <Widget>[
-                _buildSliverCarousel(theme),
-              ],
-            );
+            return false;
           },
-        ),
-      );
-
-      // If indicator is provided, include it
-      if (widget.indicator != null) {
-        return Column(
-          children: [
-            Expanded(child: carousel),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: widget.indicator,
-            ),
-          ],
+          child: Scrollable(
+            axisDirection: axisDirection,
+            controller: _controller,
+            physics: physics,
+            viewportBuilder: (BuildContext context, ViewportOffset position) {
+              return Viewport(
+                cacheExtent: 0.0,
+                cacheExtentStyle: CacheExtentStyle.viewport,
+                axisDirection: axisDirection,
+                offset: position,
+                clipBehavior: Clip.antiAlias,
+                slivers: <Widget>[
+                  _buildSliverCarousel(theme),
+                ],
+              );
+            },
+          ),
         );
-      }
 
-      return carousel;
-    });
+        // Add web-specific mouse wheel handling if isWeb is true
+        if (widget.isWeb) {
+          carousel = MouseRegion(
+            cursor: SystemMouseCursors.grab, // Show grab cursor on hover
+            child: Listener(
+              onPointerSignal: (PointerSignalEvent event) {
+                // Direct handling of mouse wheel events
+                if (event is PointerScrollEvent && _controller.hasClients) {
+                  // Get the main axis delta according to scroll direction
+                  final double delta = widget.scrollDirection == Axis.horizontal
+                      ? (event.scrollDelta.dx != 0
+                          ? event.scrollDelta.dx
+                          : event.scrollDelta.dy)
+                      : event.scrollDelta.dy;
+
+                  if (delta != 0) {
+                    // For item snapping, go directly to next/previous item
+                    if (widget.itemSnapping) {
+                      int currentItem = _controller.currentItem ?? 0;
+                      int direction = delta > 0 ? 1 : -1;
+                      int nextItem = (currentItem + direction)
+                          .clamp(0, widget.children.length - 1);
+
+                      if (nextItem != currentItem) {
+                        _controller.animateToItem(
+                          nextItem,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                        );
+                        setState(() {
+                          _currentIndex = nextItem;
+                        });
+                      }
+                    } else {
+                      // For smooth scrolling, scroll by a proportional amount
+                      // Scale delta to make scrolling more responsive
+                      double adjustedDelta = delta * 5;
+
+                      // Prevent excessive scroll speeds
+                      if (delta.abs() > 10) {
+                        adjustedDelta = delta.sign * 50;
+                      }
+
+                      // Directly scroll using jumpTo for immediate response
+                      // This feels more natural with mouse wheel
+                      _controller.position.jumpTo(
+                        (_controller.position.pixels + adjustedDelta).clamp(
+                          _controller.position.minScrollExtent,
+                          _controller.position.maxScrollExtent,
+                        ),
+                      );
+                    }
+
+                    // Pause autoplay when user interacts
+                    if (widget.autoPlay) {
+                      _stopAutoPlay();
+                      Future.delayed(const Duration(seconds: 2), () {
+                        if (mounted && widget.autoPlay) {
+                          _startAutoPlay();
+                        }
+                      });
+                    }
+                  }
+                }
+              },
+              child: GestureDetector(
+                // Add drag support for mouse drag operations
+                onHorizontalDragUpdate:
+                    widget.scrollDirection == Axis.horizontal
+                        ? (details) {
+                            _controller.position.jumpTo(
+                                _controller.position.pixels - details.delta.dx);
+                          }
+                        : null,
+                onVerticalDragUpdate: widget.scrollDirection == Axis.vertical
+                    ? (details) {
+                        _controller.position.jumpTo(
+                            _controller.position.pixels - details.delta.dy);
+                      }
+                    : null,
+                child: carousel,
+              ),
+            ),
+          );
+        }
+
+        // If indicator is provided, include it
+        if (widget.indicator != null) {
+          return Column(
+            children: [
+              Expanded(child: carousel),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: widget.indicator,
+              ),
+            ],
+          );
+        }
+
+        return carousel;
+      },
+    );
+  }
+}
+
+/// Extension to help with scroll position manipulation.
+extension ScrollPositionExtension on ScrollPosition {
+  Future<void> moveToo(
+    double to, {
+    Duration duration = Duration.zero,
+    Curve curve = Curves.linear,
+  }) async {
+    if (duration == Duration.zero) {
+      jumpTo(to);
+      return;
+    }
+
+    await animateTo(
+      to,
+      duration: duration,
+      curve: curve,
+    );
   }
 }
 
@@ -1382,13 +1501,20 @@ class _RenderSliverWeightedCarousel extends RenderSliverFixedExtentBoxAdaptor {
 ///  * [ScrollPhysics], the base class which defines the API for scrolling
 ///    physics.
 ///  * [PageScrollPhysics], scroll physics used by a [PageView].
+/// Enhanced scroll physics used by a [CarouselViewV2].
+///
+/// These physics cause the carousel item to snap to item boundaries with improved
+/// web behavior when the [isWeb] parameter is enabled.
 class CarouselScrollPhysics extends ScrollPhysics {
   /// Creates physics for a [CarouselViewV2].
-  const CarouselScrollPhysics({super.parent});
+  const CarouselScrollPhysics({super.parent, this.isWeb = false});
+
+  /// Whether this physics should use web-optimized scrolling behavior.
+  final bool isWeb;
 
   @override
   CarouselScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CarouselScrollPhysics(parent: buildParent(ancestor));
+    return CarouselScrollPhysics(parent: buildParent(ancestor), isWeb: isWeb);
   }
 
   double _getTargetPixels(
@@ -1415,9 +1541,15 @@ class CarouselScrollPhysics extends ScrollPhysics {
     } else {
       item = actual;
     }
-    if (velocity < -tolerance.velocity) {
+
+    // Adjust velocity threshold for web vs. mobile
+    final double velocityThreshold = isWeb && kIsWeb
+        ? tolerance.velocity * 1.2 // More forgiving for web mouse input
+        : tolerance.velocity;
+
+    if (velocity < -velocityThreshold) {
       item -= 0.5;
-    } else if (velocity > tolerance.velocity) {
+    } else if (velocity > velocityThreshold) {
       item += 0.5;
     }
     return item.roundToDouble() * itemWidth;
@@ -1443,15 +1575,45 @@ class CarouselScrollPhysics extends ScrollPhysics {
     final Tolerance tolerance = toleranceFor(metrics);
     final double target = _getTargetPixels(metrics, tolerance, velocity);
     if (target != metrics.pixels) {
-      return ScrollSpringSimulation(
-        spring,
-        metrics.pixels,
-        target,
-        velocity,
-        tolerance: tolerance,
-      );
+      // Instead of trying to multiply the spring constant directly,
+      // we'll create a modified simulation with adjusted parameters
+      if (isWeb && kIsWeb) {
+        // Web-optimized simulation with slightly stiffer spring
+        // Use a custom SpringDescription with higher spring constant
+        return ScrollSpringSimulation(
+          SpringDescription.withDampingRatio(
+            mass: 0.5, // Slightly lighter mass for faster response
+            stiffness: 500.0, // Higher stiffness for web
+            ratio: 1.0, // Critically damped
+          ),
+          metrics.pixels,
+          target,
+          velocity,
+          tolerance: tolerance,
+        );
+      } else {
+        // Regular simulation using default spring
+        return ScrollSpringSimulation(
+          spring,
+          metrics.pixels,
+          target,
+          velocity,
+          tolerance: tolerance,
+        );
+      }
     }
     return null;
+  }
+
+  @override
+  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+    // For web, adjust the offset to make mouse wheel scrolling more responsive
+    if (isWeb && kIsWeb) {
+      // Scale the offset based on its magnitude to improve mouse wheel experience
+      final double scaleFactor = offset.abs() < 10.0 ? 1.5 : 1.2;
+      return offset * scaleFactor;
+    }
+    return super.applyPhysicsToUserOffset(position, offset);
   }
 
   @override
