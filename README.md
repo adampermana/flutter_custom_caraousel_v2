@@ -343,7 +343,7 @@ This package is available under the MIT License. See the LICENSE file for detail
 
 ## Activities
 
-![Alt](https://repobeats.axiom.co/api/embed/841225761cb31adc7197f30708fd62f1bc210c6c.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/5ff5c59742531aae5b1519587dfe6e4d2cbfac39.svg "Repobeats analytics image")
 
 [pub]: https://pub.dev/packages/flutter_custom_caraousel_v2
 [github]: https://github.com/adampermana
