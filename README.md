@@ -9,6 +9,10 @@
 
 A versatile, feature-rich carousel implementation for Flutter based on Material Design 3 principles. This package offers multiple carousel layouts, auto-play functionality, custom indicators, and complete controller capabilities.
 
+## ☕ Support My Work
+If you find my work valuable, your support means the world to me! It helps me focus on creating more, learning, and growing.
+Thank you for your generosity and support! ☕
+
 [![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/adampermana)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/adampermana)
@@ -24,6 +28,7 @@ A versatile, feature-rich carousel implementation for Flutter based on Material 
 
 ## Table of Contents
 
+- [Support My Work](#support-my-work)
 - [Features](#features)
 - [Supported Platforms](#supported-platforms)
 - [Installation](#installation)
@@ -46,7 +51,7 @@ A versatile, feature-rich carousel implementation for Flutter based on Material 
   - [Indicator Properties](#indicator-properties)
 - [Contributing](#contributing)
 - [License](#license)
-- [Support My Work](#support-my-work)
+- [Activities](#activities)
 
 ## Features
 
