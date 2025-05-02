@@ -4,7 +4,7 @@ version: 0.0.1
 homepage: https://pub.dev/packages/flutter_custom_caraousel_v2
 repository: https://github.com/adampermana/flutter_custom_caraousel_v2
 issue_tracker: https://github.com/adampermana/flutter_custom_caraousel_v2/issues
-topics: [caraousel, flutter-caraousel, custom-caraousel]
+topics: [caraousel, flutter-custom-caraousel-v2, flutter-caraousel, caraousel-slider, custom-caraousel]
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
