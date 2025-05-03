@@ -497,13 +497,16 @@ class CarouselViewV2State extends State<CarouselViewV2>
         widget.overlayColor ??
             WidgetStateProperty.resolveWith((Set<WidgetState> states) {
               if (states.contains(WidgetState.pressed)) {
-                return theme.colorScheme.onSurface.withOpacity(0.1);
+                return theme.colorScheme.onSurface
+                    .withAlpha(26); // 0.1 opacity ≈ alpha 26
               }
               if (states.contains(WidgetState.hovered)) {
-                return theme.colorScheme.onSurface.withOpacity(0.08);
+                return theme.colorScheme.onSurface
+                    .withAlpha(20); // 0.08 opacity ≈ alpha 20
               }
               if (states.contains(WidgetState.focused)) {
-                return theme.colorScheme.onSurface.withOpacity(0.1);
+                return theme.colorScheme.onSurface
+                    .withAlpha(26); // 0.1 opacity ≈ alpha 26
               }
               return null;
             });

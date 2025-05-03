@@ -193,7 +193,7 @@ class CarouselDotIndicator extends BaseCarouselIndicator {
     final theme = Theme.of(context);
     final effectiveActiveColor = activeColor ?? theme.colorScheme.primary;
     final effectiveInactiveColor =
-        inactiveColor ?? theme.colorScheme.onSurface.withOpacity(0.24);
+        inactiveColor ?? theme.colorScheme.onSurface.withAlpha(61);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -267,7 +267,7 @@ class CarouselBarIndicator extends BaseCarouselIndicator {
     final theme = Theme.of(context);
     final effectiveActiveColor = activeColor ?? theme.colorScheme.primary;
     final effectiveInactiveColor =
-        inactiveColor ?? theme.colorScheme.onSurface.withOpacity(0.24);
+        inactiveColor ?? theme.colorScheme.onSurface.withAlpha(61);
     final effectiveBorderRadius =
         borderRadius ?? BorderRadius.circular(height / 2);
 
@@ -335,7 +335,7 @@ class CircularIndicator extends BaseCarouselIndicator {
     final theme = Theme.of(context);
     final effectiveActiveColor = activeColor ?? theme.colorScheme.primary;
     final effectiveInactiveColor =
-        inactiveColor ?? theme.colorScheme.onSurface.withOpacity(0.24);
+        inactiveColor ?? theme.colorScheme.onSurface.withAlpha(61);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -407,7 +407,7 @@ class SequentialFillIndicator extends BaseCarouselIndicator {
     final theme = Theme.of(context);
     final effectiveActiveColor = activeColor ?? theme.colorScheme.primary;
     final effectiveInactiveColor =
-        inactiveColor ?? theme.colorScheme.onSurface.withOpacity(0.24);
+        inactiveColor ?? theme.colorScheme.onSurface.withAlpha(61);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -477,7 +477,7 @@ class ExpandingDotIndicator extends BaseCarouselIndicator {
     final theme = Theme.of(context);
     final effectiveActiveColor = activeColor ?? theme.colorScheme.primary;
     final effectiveInactiveColor =
-        inactiveColor ?? theme.colorScheme.onSurface.withOpacity(0.24);
+        inactiveColor ?? theme.colorScheme.onSurface.withAlpha(61);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
