@@ -8,6 +8,18 @@ void main() {
   runApp(const CarouselDemoApp());
 }
 
+// Definisi routes aplikasi
+final Map<String, WidgetBuilder> routes = {
+  '/': (context) => const CarouselDemoHomePage(),
+  '/weighted-carousel': (context) => const WeightedCarouselDemo(),
+  '/auto-play': (context) => const AutoPlayDemo(),
+  '/indicator-styles': (context) => const IndicatorStylesDemo(),
+  '/controller': (context) => const ControllerDemo(),
+  '/layout-variations': (context) => const LayoutVariationsDemo(),
+  '/custom-demo': (context) => const CustomDemo(),
+  '/vertical-carousel': (context) => const VerticalCarouselDemo(),
+};
+
 class CarouselDemoApp extends StatelessWidget {
   const CarouselDemoApp({super.key});
 
@@ -20,7 +32,8 @@ class CarouselDemoApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const CarouselDemoHomePage(),
+      initialRoute: '/',
+      routes: routes,
     );
   }
 }
@@ -42,64 +55,43 @@ class CarouselDemoHomePage extends StatelessWidget {
             context,
             title: 'Weighted Carousel',
             subtitle: 'Carousel with varying item sizes',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const WeightedCarouselDemo()),
-            ),
+            routeName: '/weighted-carousel',
           ),
           _buildDemoCard(
             context,
             title: 'AutoPlay Demo',
             subtitle: 'Carousel with autoplay feature',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AutoPlayDemo()),
-            ),
+            routeName: '/auto-play',
           ),
           _buildDemoCard(
             context,
             title: 'Indicator Styles',
             subtitle: 'Different types of indicators for carousel',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const IndicatorStylesDemo()),
-            ),
+            routeName: '/indicator-styles',
           ),
           _buildDemoCard(
             context,
             title: 'Controller Demo',
             subtitle: 'Use of controllers for programmatic control',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ControllerDemo()),
-            ),
+            routeName: '/controller',
           ),
           _buildDemoCard(
             context,
             title: 'Layout Variations',
             subtitle: 'Multi-browse, Hero, and Full-screen layouts',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const LayoutVariationsDemo()),
-            ),
+            routeName: '/layout-variations',
           ),
           _buildDemoCard(
             context,
             title: 'Custom Demo',
             subtitle: 'Combination of features for special purposes',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const CustomDemo()),
-            ),
+            routeName: '/custom-demo',
           ),
           _buildDemoCard(
             context,
             title: 'Vertical Carousel',
             subtitle: 'Carousel with vertical scrolling',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const VerticalCarouselDemo()),
-            ),
+            routeName: '/vertical-carousel',
           ),
         ],
       ),
@@ -110,14 +102,14 @@ class CarouselDemoHomePage extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String subtitle,
-    required VoidCallback onTap,
+    required String routeName,
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       child: InkWell(
-        onTap: onTap,
+        onTap: () => Navigator.pushNamed(context, routeName),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(

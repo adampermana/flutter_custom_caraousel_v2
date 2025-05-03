@@ -148,7 +148,6 @@ class _WeightedCarouselDemoState extends State<WeightedCarouselDemo> {
       ),
       body: Column(
         children: [
-          // Pilihan distribusi bobot
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.grey.shade100,
@@ -243,8 +242,6 @@ class _AutoPlayDemoState extends State<AutoPlayDemo> {
   void initState() {
     super.initState();
 
-    // Opsional: Mendengarkan perubahan posisi pada controller
-    // untuk mengupdate _currentIndex
     _carouselController.addListener(() {
       if (_carouselController.hasClients &&
           _carouselController.currentItem != null &&
@@ -971,9 +968,9 @@ class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
   String _getLayoutDescription() {
     switch (_currentLayout) {
       case LayoutType.hero:
-        return 'Hero: One large item in the middle with small items next to it [1, 5, 1]';
+        return 'Hero: One large item in the middle with small items next to it [2, 3, 2]';
       case LayoutType.multiBrowse:
-        return 'Multi-Browse: Multiple items with varying sizes [1, 2, 3, 2, 1]';
+        return 'Multi-Browse: Multiple items with varying sizes [3, 5, 5, 3]';
       case LayoutType.fullScreen:
         return 'Full-Screen: Only one item is visible on the full screen [1]';
     }
@@ -983,7 +980,7 @@ class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
     switch (_currentLayout) {
       case LayoutType.hero:
         return CarouselViewV2.weighted(
-          flexWeights: const [1, 1, 1, 2, 3, 5, 5, 3, 2, 1, 1, 1],
+          flexWeights: const [2, 3, 2],
           controller: _carouselController,
           isWeb: kIsWeb,
           indicator: CarouselIndicator(
@@ -1003,7 +1000,7 @@ class _LayoutVariationsDemoState extends State<LayoutVariationsDemo> {
 
       case LayoutType.multiBrowse:
         return CarouselViewV2.weighted(
-          flexWeights: const [2, 3, 2],
+          flexWeights: const [3, 5, 5, 3],
           controller: _carouselController,
           isWeb: kIsWeb,
           indicator: CarouselIndicator(
@@ -1494,15 +1491,30 @@ class VerticalCarouselDemo extends StatefulWidget {
 
 class _VerticalCarouselDemoState extends State<VerticalCarouselDemo> {
   int _currentIndex = 0;
-  final CarouselControllerv2 _carouselController = CarouselControllerv2();
+  late final CarouselControllerv2 _carouselController;
+  bool _isControllerReady = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Opsional: Mendengarkan perubahan posisi pada controller
-    // untuk mengupdate _currentIndex
+    _carouselController = CarouselControllerv2(initialItem: 0);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isControllerReady = true;
+        });
+
+        _setupControllerListener();
+      }
+    });
+  }
+
+  void _setupControllerListener() {
     _carouselController.addListener(() {
+      if (!mounted) return;
+
       if (_carouselController.hasClients &&
           _carouselController.currentItem != null &&
           _carouselController.currentItem != _currentIndex) {
@@ -1521,104 +1533,231 @@ class _VerticalCarouselDemoState extends State<VerticalCarouselDemo> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 600;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Vertical Carousel'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Expanded(
-        child: Row(
+      body: SafeArea(
+        child: isSmallScreen
+            ? _buildVerticalLayout(screenSize)
+            : _buildHorizontalLayout(screenSize),
+      ),
+    );
+  }
+
+  Widget _buildVerticalLayout(Size screenSize) {
+    return Column(
+      children: [
+        Expanded(
+          flex: 6,
+          child: CarouselViewV2(
+            itemExtent: screenSize.height * 0.6,
+            isWeb: kIsWeb,
+            scrollDirection: Axis.vertical,
+            controller: _carouselController,
+            onTap: _isControllerReady
+                ? (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  }
+                : null,
+            children: _buildCarouselItems(isVertical: true),
+          ),
+        ),
+
+        // Panel kontrol di bagian bawah
+        Container(
+          height: 80,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          color: Colors.grey.shade100,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                onPressed: _isControllerReady && _currentIndex > 0
+                    ? () => _navigateToItem(_currentIndex - 1)
+                    : null,
+                icon: const Icon(Icons.arrow_upward),
+              ),
+              Expanded(
+                child: CarouselIndicator(
+                  styleIndicator: StyleIndicator.dotIndicator,
+                  count: DemoData.items.length,
+                  currentIndex: _currentIndex,
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  inactiveColor: Colors.grey.withOpacity(0.5),
+                ),
+              ),
+              IconButton(
+                onPressed: _isControllerReady &&
+                        _currentIndex < DemoData.items.length - 1
+                    ? () => _navigateToItem(_currentIndex + 1)
+                    : null,
+                icon: const Icon(Icons.arrow_downward),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHorizontalLayout(Size screenSize) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: CarouselViewV2(
+            itemExtent: screenSize.height * 0.7,
+            isWeb: kIsWeb,
+            scrollDirection: Axis.vertical,
+            controller: _carouselController,
+            onTap: _isControllerReady
+                ? (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  }
+                : null,
+            children: _buildCarouselItems(isVertical: true),
+          ),
+        ),
+        Container(
+          width: 100,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          color: Colors.grey.shade100,
+          child: Column(
+            children: [
+              RotatedBox(
+                quarterTurns: 1,
+                child: CarouselIndicator(
+                  styleIndicator: StyleIndicator.dotIndicator,
+                  count: DemoData.items.length,
+                  currentIndex: _currentIndex,
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  inactiveColor: Colors.grey.withOpacity(0.5),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Informasi item saat ini
+              RotatedBox(
+                quarterTurns: 1,
+                child: Text(
+                  'Item ${_currentIndex + 1}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              const Spacer(),
+
+              // Tombol naik
+              IconButton(
+                onPressed: _isControllerReady && _currentIndex > 0
+                    ? () => _navigateToItem(_currentIndex - 1)
+                    : null,
+                icon: const Icon(Icons.arrow_upward),
+              ),
+
+              const SizedBox(height: 16),
+
+              IconButton(
+                onPressed: _isControllerReady &&
+                        _currentIndex < DemoData.items.length - 1
+                    ? () => _navigateToItem(_currentIndex + 1)
+                    : null,
+                icon: const Icon(Icons.arrow_downward),
+              ),
+
+              const SizedBox(height: 24),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.home),
+                tooltip: 'Kembali ke Halaman Utama',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _navigateToItem(int index) {
+    if (!_isControllerReady || !mounted) return;
+
+    try {
+      _carouselController.animateToItem(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+
+      setState(() {
+        _currentIndex = index;
+      });
+    } catch (e) {
+      debugPrint('Error navigating to item: $e');
+      if (mounted) {
+        setState(() {
+          _currentIndex = _carouselController.currentItem ?? 0;
+        });
+      }
+    }
+  }
+
+  List<Widget> _buildCarouselItems({required bool isVertical}) {
+    return DemoData.items.map((item) {
+      return Container(
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: item.color,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Vertical carousel
-            Flexible(
-              child: CarouselViewV2(
-                itemExtent: 900,
-                isWeb: kIsWeb,
-                scrollDirection: Axis.vertical,
-                controller: _carouselController,
-                onTap: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-                children: buildCarouselItems(DemoData.items, isVertical: true),
+            Icon(
+              item.icon,
+              size: isVertical ? 64 : 80,
+              color: Colors.white,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              item.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
-
-            // Side indicator and controls
-            Container(
-              width: 80,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              color: Colors.grey.shade100,
-              child: Column(
-                children: [
-                  // Vertical indicators
-                  RotatedBox(
-                    quarterTurns: 1, // Rotate to vertical
-                    child: CarouselIndicator(
-                      styleIndicator: StyleIndicator.dotIndicator,
-                      count: DemoData.items.length,
-                      currentIndex: _currentIndex,
-                      activeColor: Theme.of(context).colorScheme.primary,
-                      inactiveColor: Colors.grey.withOpacity(0.5),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Current item info
-                  RotatedBox(
-                    quarterTurns: 1,
-                    child: Text(
-                      'Item ${_currentIndex + 1}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // Up button
-                  IconButton(
-                    onPressed: _currentIndex > 0
-                        ? () {
-                            _carouselController.animateToItem(
-                              _currentIndex - 1,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                            setState(() {
-                              _currentIndex--;
-                            });
-                          }
-                        : null,
-                    icon: const Icon(Icons.arrow_upward),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Down button
-                  IconButton(
-                    onPressed: _currentIndex < DemoData.items.length - 1
-                        ? () {
-                            _carouselController.animateToItem(
-                              _currentIndex + 1,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                            setState(() {
-                              _currentIndex++;
-                            });
-                          }
-                        : null,
-                    icon: const Icon(Icons.arrow_downward),
-                  ),
-                ],
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                item.description,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 16,
+                ),
               ),
             ),
           ],
         ),
-      ),
-    );
+      );
+    }).toList();
   }
 }
 
