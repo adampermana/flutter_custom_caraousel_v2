@@ -1,3 +1,9 @@
+## 0.1.1 - 05/03/2025
+### Bug Fixes and Package Improvements
+* Fixed static analysis issues by replacing deprecated `withOpacity()` with `withAlpha()` to avoid precision loss warnings
+* Shortened package description to meet pub.dev validation requirements (under 180 characters)
+* Improved package score on pub.dev
+
 ## 0.1.0 - 05/03/2025
 
 ### intial Release of Flutter Custom Carousel V2
