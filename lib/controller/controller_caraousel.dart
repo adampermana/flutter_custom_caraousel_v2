@@ -1,4 +1,4 @@
-part of '../../flutter_custom_caraousel_v2.dart';
+part of '../flutter_custom_caraousel_v2.dart';
 
 /// A controller for [CarouselViewV2].
 ///

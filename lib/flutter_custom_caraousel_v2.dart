@@ -14,7 +14,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-part 'src/controller/controller_caraousel.dart';
+part 'controller/controller_caraousel.dart';
 part 'caraousel_indicator.dart';
 // part 'caraousel_view_indicator.dart';
 

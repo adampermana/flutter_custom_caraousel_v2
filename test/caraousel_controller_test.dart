@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_custom_caraousel_v2/flutter_custom_caraousel_v2.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('CarouselController currentItem returns null when no clients',
