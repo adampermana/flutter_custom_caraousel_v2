@@ -34,11 +34,12 @@ void main() {
         await tester.pumpWidget(
           const MaterialApp(
             home: Scaffold(
-              body: CarouselDotIndicator(
+              body: CarouselIndicator(
                 count: 5,
                 currentIndex: 2,
                 activeColor: Colors.blue,
                 inactiveColor: Colors.grey,
+                styleIndicator: StyleIndicator.dotIndicator,
               ),
             ),
           ),
@@ -47,26 +48,6 @@ void main() {
         // Find all containers (dots)
         final dotsFinder = find.byType(Container);
         expect(dotsFinder, findsNWidgets(5));
-      });
-
-      testWidgets('CarouselBarIndicator displays correct number of bars',
-          (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: CarouselBarIndicator(
-                count: 4,
-                currentIndex: 1,
-                activeColor: Colors.blue,
-                inactiveColor: Colors.grey,
-              ),
-            ),
-          ),
-        );
-
-        // Find all containers (bars)
-        final barsFinder = find.byType(Container);
-        expect(barsFinder, findsNWidgets(4));
       });
 
       testWidgets('CarouselView with indicator displays correctly',

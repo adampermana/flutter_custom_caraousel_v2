@@ -14,7 +14,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-part 'controller/controller_caraousel.dart';
+part 'src/controller/controller_caraousel.dart';
 part 'caraousel_indicator.dart';
 // part 'caraousel_view_indicator.dart';
 
@@ -357,10 +357,10 @@ class CarouselViewV2 extends StatefulWidget {
   final bool isWeb;
 
   @override
-  State<CarouselViewV2> createState() => CarouselViewV2State();
+  State<CarouselViewV2> createState() => _CarouselViewV2State();
 }
 
-class CarouselViewV2State extends State<CarouselViewV2>
+class _CarouselViewV2State extends State<CarouselViewV2>
     with SingleTickerProviderStateMixin {
   double? _itemExtent;
   List<int>? get _flexWeights => widget.flexWeights;
@@ -602,7 +602,7 @@ class CarouselViewV2State extends State<CarouselViewV2>
     final ThemeData theme = Theme.of(context);
     final AxisDirection axisDirection = _getDirection(context);
     final ScrollPhysics physics = widget.itemSnapping
-        ? const CarouselScrollPhysics()
+        ? const _CarouselScrollPhysics()
         : ScrollConfiguration.of(context).getScrollPhysics(context);
 
     return LayoutBuilder(
@@ -1508,16 +1508,16 @@ class _RenderSliverWeightedCarousel extends RenderSliverFixedExtentBoxAdaptor {
 ///
 /// These physics cause the carousel item to snap to item boundaries with improved
 /// web behavior when the [isWeb] parameter is enabled.
-class CarouselScrollPhysics extends ScrollPhysics {
+class _CarouselScrollPhysics extends ScrollPhysics {
   /// Creates physics for a [CarouselViewV2].
-  const CarouselScrollPhysics({super.parent, this.isWeb = false});
+  const _CarouselScrollPhysics({super.parent, this.isWeb = false});
 
   /// Whether this physics should use web-optimized scrolling behavior.
   final bool isWeb;
 
   @override
-  CarouselScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CarouselScrollPhysics(parent: buildParent(ancestor), isWeb: isWeb);
+  _CarouselScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return _CarouselScrollPhysics(parent: buildParent(ancestor), isWeb: isWeb);
   }
 
   double _getTargetPixels(
