@@ -1,3 +1,7 @@
+## 0.2.0 - 05/05/2025
+* Updates minimum supported SDK version to Flutter 3.19.0/Dart 3.3.0
+* General compatibility improvements.
+
 ## 0.1.1 - 05/03/2025
 ### Bug Fixes and Package Improvements
 * Fixed static analysis issues by replacing deprecated `withOpacity()` with `withAlpha()` to avoid precision loss warnings
