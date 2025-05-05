@@ -1,7 +1,12 @@
 part of './flutter_custom_caraousel_v2.dart';
 
-// part of 'flutter_custom_caraousel_v2.dart';
-
+/// Defines the available styles for carousel indicators
+/// - [StyleIndicator.dotIndicator]: Shows Standard circular dots.
+/// - [StyleIndicator.barIndicator]: Horizontal bars with customizable width.
+/// - [StyleIndicator.circularIndicator]: Shows Circular indicators with border emphasis.
+/// - [StyleIndicator.sequentialFillIndicator]: Shows Dots that fill up sequentially to the current position.
+/// - [StyleIndicator.expandingDotIndicator]: Shows Dots that expand horizontally for the active item.
+///
 enum StyleIndicator {
   dotIndicator,
   barIndicator,
@@ -10,8 +15,12 @@ enum StyleIndicator {
   expandingDotIndicator,
 }
 
-abstract class BaseCarouselIndicator extends StatelessWidget {
-  const BaseCarouselIndicator({
+/// Base class for all carousel indicators
+///
+/// This abstract class provides common properties and functionality
+/// that all carousel indicators should implement.
+abstract class _BaseCarouselIndicator extends StatelessWidget {
+  const _BaseCarouselIndicator({
     super.key,
     required this.count,
     required this.currentIndex,
@@ -39,7 +48,10 @@ abstract class BaseCarouselIndicator extends StatelessWidget {
   Widget build(BuildContext context);
 }
 
-class CarouselIndicator extends BaseCarouselIndicator {
+/// Main carousel indicator that supports multiple styles
+///
+/// This class serves as a factory for creating different indicator styles
+class CarouselIndicator extends _BaseCarouselIndicator {
   const CarouselIndicator({
     required this.styleIndicator,
     super.key,
@@ -101,7 +113,7 @@ class CarouselIndicator extends BaseCarouselIndicator {
   Widget build(BuildContext context) {
     switch (styleIndicator) {
       case StyleIndicator.dotIndicator:
-        return CarouselDotIndicator(
+        return _CarouselDotIndicator(
           count: count,
           currentIndex: currentIndex,
           activeColor: activeColor,
@@ -113,7 +125,7 @@ class CarouselIndicator extends BaseCarouselIndicator {
         );
 
       case StyleIndicator.barIndicator:
-        return CarouselBarIndicator(
+        return _CarouselBarIndicator(
           count: count,
           currentIndex: currentIndex,
           activeColor: activeColor,
@@ -127,7 +139,7 @@ class CarouselIndicator extends BaseCarouselIndicator {
         );
 
       case StyleIndicator.circularIndicator:
-        return CircularIndicator(
+        return _CircularIndicator(
           count: count,
           currentIndex: currentIndex,
           activeColor: activeColor,
@@ -139,7 +151,7 @@ class CarouselIndicator extends BaseCarouselIndicator {
         );
 
       case StyleIndicator.sequentialFillIndicator:
-        return SequentialFillIndicator(
+        return _SequentialFillIndicator(
           count: count,
           currentIndex: currentIndex,
           activeColor: activeColor,
@@ -150,7 +162,7 @@ class CarouselIndicator extends BaseCarouselIndicator {
         );
 
       case StyleIndicator.expandingDotIndicator:
-        return ExpandingDotIndicator(
+        return _ExpandingDotIndicator(
           count: count,
           currentIndex: currentIndex,
           activeColor: activeColor,
@@ -166,9 +178,8 @@ class CarouselIndicator extends BaseCarouselIndicator {
 }
 
 /// Standard dot indicator for carousels
-class CarouselDotIndicator extends BaseCarouselIndicator {
-  const CarouselDotIndicator({
-    super.key,
+class _CarouselDotIndicator extends _BaseCarouselIndicator {
+  const _CarouselDotIndicator({
     required super.count,
     required super.currentIndex,
     super.activeColor,
@@ -232,9 +243,8 @@ class CarouselDotIndicator extends BaseCarouselIndicator {
 }
 
 /// Bar style indicator for carousels
-class CarouselBarIndicator extends BaseCarouselIndicator {
-  const CarouselBarIndicator({
-    super.key,
+class _CarouselBarIndicator extends _BaseCarouselIndicator {
+  const _CarouselBarIndicator({
     required super.count,
     required super.currentIndex,
     super.activeColor,
@@ -308,9 +318,8 @@ class CarouselBarIndicator extends BaseCarouselIndicator {
 }
 
 /// Circular indicator with border for carousels
-class CircularIndicator extends BaseCarouselIndicator {
-  const CircularIndicator({
-    super.key,
+class _CircularIndicator extends _BaseCarouselIndicator {
+  const _CircularIndicator({
     required super.count,
     required super.currentIndex,
     super.activeColor,
@@ -384,9 +393,8 @@ class CircularIndicator extends BaseCarouselIndicator {
 }
 
 /// Sequential fill indicator for carousels (fills dots up to current index)
-class SequentialFillIndicator extends BaseCarouselIndicator {
-  const SequentialFillIndicator({
-    super.key,
+class _SequentialFillIndicator extends _BaseCarouselIndicator {
+  const _SequentialFillIndicator({
     required super.count,
     required super.currentIndex,
     super.activeColor,
@@ -446,9 +454,8 @@ class SequentialFillIndicator extends BaseCarouselIndicator {
 }
 
 /// A customizable animated indicator that expands the active dot
-class ExpandingDotIndicator extends BaseCarouselIndicator {
-  const ExpandingDotIndicator({
-    super.key,
+class _ExpandingDotIndicator extends _BaseCarouselIndicator {
+  const _ExpandingDotIndicator({
     required super.count,
     required super.currentIndex,
     super.activeColor,

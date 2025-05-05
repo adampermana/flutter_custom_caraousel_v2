@@ -7,8 +7,8 @@ issue_tracker: https://github.com/adampermana/flutter_custom_caraousel_v2/issues
 topics: [caraousel, flutter-custom-caraousel-v2, flutter-caraousel, caraousel-slider, custom-caraousel]
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.10.0"
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.19.0'
 
 dependencies:
   collection: ^1.18.0
@@ -18,4 +18,4 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
